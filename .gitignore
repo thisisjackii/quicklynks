@@ -1,0 +1,19 @@
+# File: .gitignore
+# Common ignores for Go, Node, and general development
+*.db
+*.db-journal
+*.log
+
+# Go
+backend/quicklynks
+backend/.env
+
+# Node
+frontend/node_modules
+frontend/.env
+frontend/build
+frontend/.svelte-kit
+.DS_Store
+
+# IDE
+.vscode/

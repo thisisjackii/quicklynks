@@ -1,0 +1,53 @@
+# File: docker-compose.yml
+# For local development, spins up the backend, a Postgres DB, and the frontend.
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: quicklynks_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: quicklynks
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  backend:
+    container_name: quicklynks_backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      # Use this for docker-compose, overrides .env file
+      DATABASE_URL: "postgres://user:password@postgres:5432/quicklynks?sslmode=disable"
+      JWT_SECRET: "skibididopdopdop"
+      PORT: "8080"
+      CORS_ALLOWED_ORIGIN: "http://localhost:5173"
+    restart: unless-stopped
+
+  frontend:
+    container_name: quicklynks_frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      PUBLIC_API_BASE_URL: "http://localhost:8080"
+      # Required for SvelteKit container to listen on all interfaces
+      HOST: "0.0.0.0"
+      PORT: "5173"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
