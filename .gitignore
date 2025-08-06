@@ -1,19 +1,25 @@
-# File: .gitignore
-# Common ignores for Go, Node, and general development
-*.db
-*.db-journal
-*.log
-
-# Go
-backend/quicklynks
-backend/.env
-
-# Node
-frontend/node_modules
-frontend/.env
-frontend/build
-frontend/.svelte-kit
+# File: /quicklynks/.gitignore
+# Ignore OS-specific files
 .DS_Store
+Thumbs.db
 
-# IDE
+# Ignore IDE files
+.idea/
 .vscode/
+
+# Ignore dependency directories
+/backend/vendor/
+/frontend/node_modules/
+/frontend/.svelte-kit/
+/frontend/build/
+
+# Ignore environment files
+.env
+*.env.local
+
+# Ignore build artifacts
+/backend/quicklynks-api
+/backend/docs/
+
+# Ignore log files
+*.log

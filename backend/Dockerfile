@@ -1,35 +1,34 @@
-# File: backend/Dockerfile
-# Stage 1: Build the application
-FROM golang:1.21-alpine AS builder
+# File: /quicklynks/backend/Dockerfile
+# --- Build Stage ---
+FROM golang:1.21-alpine3.16 AS builder
 
 WORKDIR /app
 
-# Copy go.mod and go.sum files to download dependencies
+# Copy module files and download dependencies
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy the source code
+# Copy the rest of the source code
 COPY . .
 
 # Build the application
-# CGO_ENABLED=0 is important for a static binary, especially when using sqlite
+# CGO_ENABLED=0 is important for a static binary
 # -ldflags="-w -s" strips debug information to reduce binary size
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o quicklynks .
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /quicklynks-api ./cmd/api
 
-# Stage 2: Create a minimal final image
-FROM alpine:latest
+# --- Final Stage ---
+FROM alpine:3.19
 
-WORKDIR /root/
+WORKDIR /
 
-# Copy the built binary from the builder stage
-COPY --from=builder /app/quicklynks .
+# Copy the binary from the builder stage
+COPY --from=builder /quicklynks-api /quicklynks-api
 
-# Copy the database schema
-COPY db/schema.sql .
+# Update Alpine packages to latest security patches
+RUN apk update && apk upgrade
 
 # Expose the port the app runs on
 EXPOSE 8080
 
-# Command to run the application
-# The app will create the sqlite db on first run if it doesn't exist
-CMD ["./quicklynks"]
+# Command to run the executable
+CMD ["/quicklynks-api"]

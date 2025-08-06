@@ -1,4 +1,4 @@
-# File: backend/internal/utils/password.go
+// File: /quicklynks/backend/internal/utils/hash.go
 package utils
 
 import "golang.org/x/crypto/bcrypt"

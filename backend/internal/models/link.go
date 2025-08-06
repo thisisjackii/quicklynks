@@ -1,13 +1,13 @@
-# File: backend/internal/models/link.go
+// File: /quicklynks/backend/internal/models/link.go
 package models
 
-import "time"
+import "gorm.io/gorm"
 
-// Link represents a link in the database.
+// Link represents a shortened URL.
 type Link struct {
-	ID        int       `json:"id" db:"id"`
-	UserID    int       `json:"-" db:"user_id"` // Hide user_id from public JSON
-	Title     string    `json:"title" db:"title"`
-	URL       string    `json:"url" db:"url"`
-	CreatedAt time.Time `json:"createdAt" db:"created_at"`
+	gorm.Model
+	OriginalURL string  `gorm:"not null" json:"original_url"`
+	ShortCode   string  `gorm:"uniqueIndex;not null" json:"short_code"`
+	UserID      uint    `gorm:"not null" json:"user_id"`
+	Clicks      []Click `json:"-"` // Omit from general link responses for performance
 }

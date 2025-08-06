@@ -1,13 +1,12 @@
-# File: backend/internal/models/user.go
+// File: /quicklynks/backend/internal/models/user.go
 package models
 
-import "time"
+import "gorm.io/gorm"
 
 // User represents a user in the database.
 type User struct {
-	ID           int       `json:"id" db:"id"`
-	Username     string    `json:"username" db:"username"`
-	Email        string    `json:"email" db:"email"`
-	PasswordHash string    `json:"-" db:"password_hash"` // Never expose password hash
-	CreatedAt    time.Time `json:"createdAt" db:"created_at"`
+	gorm.Model
+	Email        string `gorm:"uniqueIndex;not null" json:"email"`
+	PasswordHash string `gorm:"not null" json:"-"` // Omit from JSON responses
+	Links        []Link `json:"links,omitempty"`
 }

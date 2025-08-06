@@ -1,0 +1,9 @@
+# File: /quicklynks/.dockerignore
+**/.git
+**/.vscode
+**/node_modules
+**/.env
+**/README.md
+**/*.md
+**/backend/test
+**/frontend/tests

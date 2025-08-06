@@ -1,37 +1,44 @@
-# File: backend/config/config.go
+// File: /quicklynks/backend/config/config.go
 package config
 
 import (
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
 // Config stores all configuration of the application.
+// The values are read by viper from a config file or environment variables.
 type Config struct {
-	Port              string `mapstructure:"PORT"`
-	DatabaseURL       string `mapstructure:"DATABASE_URL"`
-	JWTSecret         string `mapstructure:"JWT_SECRET"`
-	CORSAllowedOrigin string `mapstructure:"CORS_ALLOWED_ORIGIN"`
+	GinMode    string `mapstructure:"GIN_MODE"`
+	ServerPort string `mapstructure:"SERVER_PORT"`
+	SecretKey  string `mapstructure:"SECRET_KEY"`
+	DBHost     string `mapstructure:"DB_HOST"`
+	DBUser     string `mapstructure:"DB_USER"`
+	DBPassword string `mapstructure:"DB_PASSWORD"`
+	DBName     string `mapstructure:"DB_NAME"`
+	DBPort     string `mapstructure:"DB_PORT"`
+	DBSslMode  string `mapstructure:"DB_SSL_MODE"`
 }
 
-// Load reads configuration from file or environment variables.
-func Load() (config Config, err error) {
-	// Set default values
-	viper.SetDefault("PORT", "8080")
-	viper.SetDefault("DATABASE_URL", "quicklynks.db")
-	viper.SetDefault("JWT_SECRET", "skibididopdopdop")
-	viper.SetDefault("CORS_ALLOWED_ORIGIN", "http://localhost:5173")
+// LoadConfig reads configuration from file or environment variables.
+func LoadConfig(path string) (config Config, err error) {
+	// Attempt to load .env file. This is for local development.
+	// In production, environment variables are set directly.
+	godotenv.Load()
 
-	// Look for a .env file in the current directory
-	viper.AddConfigPath(".")
+	viper.AddConfigPath(path)
 	viper.SetConfigName(".env")
 	viper.SetConfigType("env")
 
-	// Automatically read environment variables
 	viper.AutomaticEnv()
 
-	// Read the config file if it exists
-	// Ignore error if file not found, as env vars might be used instead
-	_ = viper.ReadInConfig()
+	err = viper.ReadInConfig()
+	if err != nil {
+		// If the config file is not found, we can continue as env vars might be set.
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			return
+		}
+	}
 
 	err = viper.Unmarshal(&config)
 	return
